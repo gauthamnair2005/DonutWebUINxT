@@ -1,0 +1,302 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+    <title>Donut WebUI NxT</title>
+        <style>
+            .btn {
+                cursor: pointer;
+                border: 1px solid #3498db;
+                background-color: transparent;
+                height: 200px;
+                width: 200px;
+                color: #3498db;
+                font-size: 1.5em;
+                box-shadow: 0 6px 6px rgba(0, 0, 0, 0.6);
+                transition: all 0.3s ease;
+            }
+            .btn:hover {
+                background-color: #3498db;
+                color: white;
+            }
+            body{
+                font-family: "Segoe UI", Arial, Helvetica, sans-serif;
+                background: linear-gradient(to right, #1a2a6c, #b21f1f, #fdbb2d);
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                height: 100vh;
+                margin: 0;
+                color: white;
+            }
+            legend{
+                font-size: 20px;
+                background-color: rgb(0, 0, 0);
+                color: rgb(255, 255, 255);
+                padding: 5px 10px;
+                border-radius: 5px;
+                border: 1px solid rgba(0, 0, 0, 0.1);
+                text-align: left;
+            }
+            fieldset{
+                background-color: rgba(255, 255, 255, 0.5);
+                padding: 20px;
+                border-radius: 15px;
+                text-align: left;
+            }
+            main {
+                text-align: center;
+            }
+            h1 {
+                margin-bottom: 50px;
+            }
+            .btn h1 {
+                margin: 0;
+            }
+            .taskbar {
+                position: fixed;
+                bottom: 0;
+                left: 0;
+                width: 100%;
+                background-color: rgba(255, 255, 255, 0.5);
+                display: flex;
+                justify-content: space-around;
+                padding: 10px 0;
+                box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.2);
+                justify-content: space-between;
+            }
+            .taskbar .left, .taskbar .right {
+                display: flex;
+                align-items: center;
+            }
+
+            .taskbar .right {
+                margin-right: 20px;
+                justify-content: flex-end;
+            }
+
+            .taskbar .left {
+                margin-left: 20px;
+                justify-content: flex-start;
+            }
+            .taskbar a {
+                color: white;
+                text-decoration: none;
+                font-size: 1.2em;
+                background-color: rgba(0, 0, 0, 0.7);
+                border-radius: 15px;
+                padding: 5px 10px;
+            }
+            .time-date {
+                color: white;
+                text-decoration: none;
+                background-color: rgba(0, 0, 0, 0.7);
+                border-radius: 15px;
+                padding: 5px 10px;
+                font-size: 1.2em;
+                margin-left: 20px;
+            }
+            .dialog {
+                position: fixed;
+                top: 70%;
+                background-color: rgba(255, 255, 255, 0.5); 
+                padding: 20px;
+                border-radius: 10px;
+                box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+                display: none;
+                flex-direction: column;
+                justify-content: flex-end;
+                align-items: center;
+                width: 30%;
+                height: 70%;
+                overflow: auto;
+            }
+            .dialog-left {
+                left: 3.5%;
+                transform: translate(-10%, -70%);
+            }
+            .dialog-right {
+                right: 0%;
+                bottom: 0%;
+                transform: translate(-5%, -70%);
+            }
+            .btn {
+                margin: 10px;
+                height: 15vh;
+                width: 20vw;
+            }
+            .digital-clock {
+                margin: 20px;
+                width: 100px;
+                height: 100px;
+                text-align: center;
+                line-height: 100px;
+                border-radius: 50%;
+                background: #030303;
+                position: relative;
+            }
+            .analog-clock {
+                margin: 20px;
+                width: 200px;
+                height: 200px;
+                text-align: center;
+                line-height: 100px;
+                border-radius: 50%;
+                background: #000000;
+                position: relative;
+            }
+            .analog-clock .hand {
+                width: 50%;
+                height: 2px;
+                position: absolute;
+                bottom: 50%;
+                left: 50%;
+                transform-origin: left bottom;
+            }
+            .analog-clock .hour-hand {
+                width: 40%;
+                border: 15px solid #ffffff;
+                border-width: 0 0 0 50px;
+                border-radius: 50%;
+                transform: rotate(0deg);
+            }
+
+            .analog-clock .minute-hand {
+                width: 60%;
+                border: 10px solid #ffffff;
+                border-width: 0 0 0 50px;
+                border-radius: 50%;
+                transform: rotate(0deg);
+            }
+
+            .analog-clock .second-hand {
+                width: 100%;
+                border: 5px solid rgb(255, 255, 255);
+                border-width: 0 0 0 10px;
+                border-radius: 50%;
+                transform: rotate(0deg);
+            }
+            @media (max-width: 600px) {
+                .btn {
+                    width: 25vw;
+                    height: 25vh;
+                    font-size: 1em;
+                }
+
+                h1 {
+                    font-size: 1.5em;
+                }
+
+                .taskbar a {
+                    font-size: 1em;
+                }
+            }
+        </style>
+    </head>
+    <body>
+        <script>
+            function getContrastColor(bgColor) {
+                if (!bgColor) {
+                    return '';
+                }
+                bgColor = bgColor.replace('#', '');
+
+                const r = parseInt(bgColor.substr(0, 2), 16);
+                const g = parseInt(bgColor.substr(2, 2), 16);
+                const b = parseInt(bgColor.substr(4, 2), 16);
+
+                const yiq = ((r * 299) + (g * 587) + (b * 114)) / 1000;
+
+                return (yiq >= 128) ? 'black' : 'white';
+            }
+            function openClockDialog() {
+                var clockDialog = document.getElementById('clock-dialog');
+                if (clockDialog.style.display === 'block') {
+                    clockDialog.style.display = 'none';
+                } else {
+                    clockDialog.style.display = 'block';
+                }
+            }
+
+            function updateClocks() {
+                const now = new Date();
+
+                const analogClock = document.querySelector('.analog-clock');
+                const secondHand = analogClock.querySelector('.second-hand');
+                const minuteHand = analogClock.querySelector('.minute-hand');
+                const hourHand = analogClock.querySelector('.hour-hand');
+
+                const seconds = now.getSeconds();
+                const minutes = now.getMinutes();
+                const hours = now.getHours();
+
+                const secondsRotation = ((seconds / 60) * 360) - 90; // Subtract 90
+                const minutesRotation = ((minutes / 60) * 360) + ((seconds/60)*6) - 90; // Subtract 90
+                const hoursRotation = ((hours / 12) * 360) + ((minutes/60)*30) - 90; // Subtract 90
+
+                secondHand.style.transform = `rotate(${secondsRotation}deg)`;
+                minuteHand.style.transform = `rotate(${minutesRotation}deg)`;
+                hourHand.style.transform = `rotate(${hoursRotation}deg)`;
+            };
+            setInterval(updateClocks, 1000);
+        </script>
+        <main>
+            <p>Donut WebUI NxT Preview</p>
+            <section>
+                <div class="dialog dialog-left" id="app-menu">
+                    <fieldset>
+                        <legend>All Apps</legend>
+                        <a href="browser.html"><button class="btn"><h1>🌐</h1></button></a>
+                        <a href="games.html"><button class="btn"><h1>🎮</h1></button></a>
+                        <a href="copyv86.html"><button class="btn"><h1>🖥️</h1></button></a>
+                        <a href="calculator.html"><button class="btn"><h1>🧮</h1></button></a>
+                        <a href="clock.html"><button class="btn"><h1>🕛</h1></button></a>
+                    </fieldset>
+                </div>
+            </section>
+        </main>
+        <div class="dialog dialog-right" id="clock-dialog">
+            <fieldset>
+                <legend>Clock</legend>
+                <div class="analog-clock">
+                    <div class="hand hour-hand"></div>
+                    <div class="hand minute-hand"></div>
+                    <div class="hand second-hand"></div>
+                </div>
+                <div class="digital-clock"></div>
+            </fieldset>
+        </div>
+        <div class="taskbar">
+            <div class="left">
+                <a href="#" onclick="openAppMenu(); return false;">🚀 Apps</a>
+            </div>
+            <div class="right">
+                <span class="time-date" id="time-date" onclick="openClockDialog(); return false;"></span>
+            </div>
+        </div>
+        <script>
+            function updateTimeDate() {
+                const now = new Date();
+                const timeDate = now.toLocaleTimeString() + ' ' + now.toLocaleDateString();
+                document.getElementById('time-date').textContent = timeDate;
+            }
+            setInterval(updateTimeDate, 1000);
+            function openAppMenu() {
+                var appMenu = document.getElementById('app-menu');
+                if (appMenu.style.display === 'block') {
+                    appMenu.style.display = 'none';
+                } else {
+                    appMenu.style.display = 'block';
+                }
+            }
+            function closeAppMenu() {
+                document.getElementById('app-menu').style.display = 'none';
+            }
+            window.onclick = function(event) {
+                var appMenu = document.getElementById('app-menu');
+                if (event.target != appMenu && event.target != document.querySelector('.left a')) {
+                    appMenu.style.display = 'none';
+                }
+            };
+        </script>
+    </body>
+</html>
