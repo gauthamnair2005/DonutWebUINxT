@@ -2,7 +2,15 @@
 <html lang="en">
     <head>
     <title>Donut WebUI NxT</title>
+    <script src="https://code.jquery.com/jquery-1.12.4.js"></script>
+    <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
+    <link rel="stylesheet" href="https://code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
         <style>
+            #mydivheader {
+                -webkit-user-select: none;
+                -ms-user-select: none;
+                user-select: none;
+            }
             .btn {
                 cursor: pointer;
                 border: 1px solid #3498db;
@@ -36,6 +44,11 @@
                 border-radius: 5px;
                 border: 1px solid rgba(0, 0, 0, 0.1);
                 text-align: left;
+            }
+            #draggable { 
+                width: 150px; 
+                height: 150px; 
+                padding: 0.5em; 
             }
             fieldset{
                 background-color: rgba(255, 255, 255, 0.5);
@@ -175,6 +188,15 @@
                 border-radius: 50%;
                 transform: rotate(0deg);
             }
+            .draggable-window {
+                position: absolute;
+                z-index: 9;
+                background-color: #f1f1f1;
+                text-align: center;
+                border: 1px solid #d3d3d3;
+                min-width: 150px;
+                min-height: 150px;
+            }
             @media (max-width: 600px) {
                 .btn {
                     width: 25vw;
@@ -190,10 +212,79 @@
                     font-size: 1em;
                 }
             }
+            .ui-dialog {
+                background-color: rgba(255, 255, 255, 0.8);
+            }
+            .taskbar img {
+                width: 32px;
+                height: 32px;
+            }
+            .ui-dialog-titlebar {
+                background-color: rgba(0, 0, 0, 0.5);
+                color: #fff;
+            }
         </style>
     </head>
     <body>
         <script>
+            $( function() {
+                $( "#dialog" ).dialog({
+                    resizable: true,
+                    height: "auto",
+                    width: 400,
+                    modal: false,
+                    open: function(event, ui) {
+                        $('.taskbar').append('<img id="dialog-icon" src="D:/DonutWebUI/Velocity.jpg" />');
+                    },
+                    close: function(event, ui) {
+                        $('#dialog-icon').remove();
+                    }
+                });
+            } );
+            $( function() {
+                $( "#draggable" ).draggable();
+            } );
+            var dragged;
+
+            document.addEventListener("drag", function(event) {
+            }, false);
+
+            document.addEventListener("dragstart", function(event) {
+            dragged = event.target;
+            event.target.style.opacity = .5;
+            }, false);
+
+            document.addEventListener("dragend", function(event) {
+            event.target.style.opacity = "";
+            }, false);
+
+            document.addEventListener("dragover", function(event) {
+            event.preventDefault();
+            }, false);
+
+            document.addEventListener("dragenter", function(event) {
+            if (event.target.className == "dropzone") {
+                event.target.style.background = "purple";
+            }
+
+            }, false);
+
+            document.addEventListener("dragleave", function(event) {
+            if (event.target.className == "dropzone") {
+                event.target.style.background = "";
+            }
+
+            }, false);
+
+            document.addEventListener("drop", function(event) {
+            event.preventDefault();
+            if (event.target.className == "dropzone") {
+                event.target.style.background = "";
+                dragged.parentNode.removeChild( dragged );
+                event.target.appendChild( dragged );
+            }
+            
+            }, false);
             function getContrastColor(bgColor) {
                 if (!bgColor) {
                     return '';
@@ -273,6 +364,9 @@
                 <span class="time-date" id="time-date" onclick="openClockDialog(); return false;"></span>
             </div>
         </div>
+        <div id="dialog" title="Welcome to Donut WebUI NxT">
+            <p>This the next generation of Donut WebUI NxT</p>
+          </div>
         <script>
             function updateTimeDate() {
                 const now = new Date();
